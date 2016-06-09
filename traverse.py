@@ -1,4 +1,4 @@
-from queue import Queue
+from collections import deque
 
 from fake_db import get_links
 
@@ -6,26 +6,29 @@ from fake_db import get_links
 def find(source, destination):
     print source, '-->', destination
     current_level = 0
-    queue = Queue()
+    queue = deque()
     visited = []
 
     if source == destination:
         return current_level
     else:
         current_level += 1
-        queue.put(source)
+        queue.appendleft(source)
 
     while queue:
-        source = queue.get()
+        print current_level, queue
+        source = queue.pop()
         links = get_links(source)
-        for link in links:
-            if link not in visited:
-                queue.put(link)
-        if destination in links:
-            return current_level
-        else:
-            current_level += 1
-            visited.append(links)
+
+        if links:
+            for link in links:
+                if link not in visited:
+                    queue.appendleft(link)
+            if destination in links:
+                return current_level
+            else:
+                current_level += 1
+                visited.append(links)
 
     print 'Not connected, sorry darlin'
     return -1
